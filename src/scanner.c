@@ -38,6 +38,41 @@ static inline void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
 static inline void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
 
+// Modelled after the corresponding change to the Elm parser
+// https://github.com/elm-tooling/tree-sitter-elm/blob/main/src/scanner.c
+// (including the comment below)
+//
+// > You can detect error recovery in the external scanner by the fact that
+// > _all_ tokens are considered valid at once.
+// https://github.com/tree-sitter/tree-sitter/pull/1783#issuecomment-1181011411
+static bool in_error_recovery(const bool *valid_symbols) {
+    return (valid_symbols[QUOTED_CONTENT_I_SINGLE] &&
+            valid_symbols[QUOTED_CONTENT_I_DOUBLE] &&
+            valid_symbols[QUOTED_CONTENT_I_HEREDOC_SINGLE] &&
+            valid_symbols[QUOTED_CONTENT_I_HEREDOC_DOUBLE] &&
+            valid_symbols[QUOTED_CONTENT_I_PARENTHESIS] &&
+            valid_symbols[QUOTED_CONTENT_I_CURLY] &&
+            valid_symbols[QUOTED_CONTENT_I_SQUARE] &&
+            valid_symbols[QUOTED_CONTENT_I_ANGLE] &&
+            valid_symbols[QUOTED_CONTENT_I_BAR] &&
+            valid_symbols[QUOTED_CONTENT_I_SLASH] &&
+            valid_symbols[QUOTED_CONTENT_SINGLE] &&
+            valid_symbols[QUOTED_CONTENT_DOUBLE] &&
+            valid_symbols[QUOTED_CONTENT_HEREDOC_SINGLE] &&
+            valid_symbols[QUOTED_CONTENT_HEREDOC_DOUBLE] &&
+            valid_symbols[QUOTED_CONTENT_PARENTHESIS] &&
+            valid_symbols[QUOTED_CONTENT_CURLY] &&
+            valid_symbols[QUOTED_CONTENT_SQUARE] &&
+            valid_symbols[QUOTED_CONTENT_ANGLE] &&
+            valid_symbols[QUOTED_CONTENT_BAR] &&
+            valid_symbols[QUOTED_CONTENT_SLASH] &&
+            valid_symbols[NEWLINE_BEFORE_DO] &&
+            valid_symbols[NEWLINE_BEFORE_BINARY_OPERATOR] &&
+            valid_symbols[NEWLINE_BEFORE_COMMENT] &&
+            valid_symbols[BEFORE_UNARY_OPERATOR] &&
+            valid_symbols[NOT_IN] &&
+            valid_symbols[QUOTED_ATOM_START]);
+}
 // Note: some checks require several lexer steps of lookahead
 // and alter its state, for these we use names check_*
 
@@ -525,6 +560,10 @@ static bool scan_newline(TSLexer *lexer, const bool *valid_symbols) {
 }
 
 static bool scan(TSLexer *lexer, const bool *valid_symbols) {
+  if (in_error_recovery(valid_symbols)) {
+        return false;
+  }
+  
   int8_t quoted_content_info_idx = find_quoted_token_info(valid_symbols);
 
   // Quoted content, which matches any character except for close
