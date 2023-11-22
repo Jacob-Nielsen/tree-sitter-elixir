@@ -4,6 +4,8 @@
 
 Elixir grammar for [tree-sitter](https://github.com/tree-sitter/tree-sitter).
 
+Modified to bail out of external scanner when in error recovery.
+
 Ready for production. Currently used by GitHub itself for source code highlighting and code navigation.
 
 ## Development
