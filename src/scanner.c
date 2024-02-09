@@ -498,6 +498,7 @@ static bool scan_newline(TSLexer *lexer, const bool *valid_symbols) {
         advance(lexer);
         return check_operator_end(lexer);
       }
+      // when
     } else if (lexer->lookahead == 'w') {
       advance(lexer);
       if (lexer->lookahead == 'h') {
@@ -510,6 +511,7 @@ static bool scan_newline(TSLexer *lexer, const bool *valid_symbols) {
           }
         }
       }
+      // and
     } else if (lexer->lookahead == 'a') {
       advance(lexer);
       if (lexer->lookahead == 'n') {
