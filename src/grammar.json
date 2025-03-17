@@ -1,4 +1,5 @@
 {
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/grammar.schema.json",
   "name": "elixir",
   "rules": {
     "source": {
@@ -327,7 +328,8 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "[_\\p{Ll}\\p{Lm}\\p{Lo}\\p{Nl}\\u1885\\u1886\\u2118\\u212E\\u309B\\u309C][\\p{ID_Continue}]*[?!]?"
+          "value": "[_\\p{Ll}\\p{Lm}\\p{Lo}\\p{Nl}\\u1885\\u1886\\u2118\\u212E\\u309B\\u309C][\\p{ID_Continue}]*[?!]?",
+          "flags": "u"
         },
         {
           "type": "STRING",
@@ -778,7 +780,8 @@
             "members": [
               {
                 "type": "PATTERN",
-                "value": "[\\p{ID_Start}_][\\p{ID_Continue}@]*[?!]?"
+                "value": "[\\p{ID_Start}_][\\p{ID_Continue}@]*[?!]?",
+                "flags": "u"
               },
               {
                 "type": "STRING",
@@ -2535,11 +2538,11 @@
               },
               {
                 "type": "PATTERN",
-                "value": "x{[0-9a-fA-F]+}"
+                "value": "x\\{[0-9a-fA-F]+\\}"
               },
               {
                 "type": "PATTERN",
-                "value": "u{[0-9a-fA-F]+}"
+                "value": "u\\{[0-9a-fA-F]+\\}"
               },
               {
                 "type": "PATTERN",
@@ -2631,7 +2634,7 @@
                     "type": "IMMEDIATE_TOKEN",
                     "content": {
                       "type": "PATTERN",
-                      "value": "[A-Z]+"
+                      "value": "[A-Z][A-Z0-9]*"
                     }
                   },
                   "named": true,
@@ -2823,7 +2826,8 @@
             "members": [
               {
                 "type": "PATTERN",
-                "value": "[\\p{ID_Start}_][\\p{ID_Continue}@]*[?!]?"
+                "value": "[\\p{ID_Start}_][\\p{ID_Continue}@]*[?!]?",
+                "flags": "u"
               },
               {
                 "type": "STRING",
@@ -6538,27 +6542,35 @@
           ]
         },
         {
-          "type": "SEQ",
+          "type": "CHOICE",
           "members": [
             {
-              "type": "SYMBOL",
-              "name": "stab_clause"
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "stab_clause"
+                },
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "SEQ",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "_terminator"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "stab_clause"
+                      }
+                    ]
+                  }
+                }
+              ]
             },
             {
-              "type": "REPEAT",
-              "content": {
-                "type": "SEQ",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "_terminator"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "stab_clause"
-                  }
-                ]
-              }
+              "type": "BLANK"
             }
           ]
         },
@@ -6746,4 +6758,3 @@
   "inline": [],
   "supertypes": []
 }
-
